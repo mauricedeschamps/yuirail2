@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Yui Rail Guide - Naha Okinawa</title>
+  <meta name="theme-color" content="#2c73d2">
+  <meta name="description" content="Official Yui Rail tourist guide with route map, station details, and travel tips.">
+  <link rel="manifest" id="manifest-link">
+  <!-- icons for traditional favicon / apple touch (fallback) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%232c73d2'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial, sans-serif'%3EY%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%232c73d2'/%3E%3Ctext x='50' y='70' font-size='50' text-anchor='middle' fill='white' font-family='Arial, sans-serif'%3EY%3C/text%3E%3C/svg%3E">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      transition: background 0.2s, color 0.2s;
+      padding-bottom: 30px;
+    }
+
+    /* Light / Dark mode variables */
+    body.light {
+      --bg-color: #f8f9fc;
+      --text-color: #1e2a3e;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+      --ad-bg: #f1f5f9;
+      --header-bg: #eef2ff;
+    }
+    body.dark {
+      --bg-color: #0b1a2e;
+      --text-color: #e2e8f0;
+      --card-bg: #1e2a3a;
+      --border-color: #2d3a4a;
+      --ad-bg: #0f212f;
+      --header-bg: #0c1a2b;
+    }
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 12px 12px;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--border-color);
+    }
+    h1 {
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+    .controls {
+      text-align: center;
+      margin: 12px 0 8px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .controls button {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 40px;
+      background: #2c73d2;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .controls button:hover {
+      background: #1a5bbf;
+      transform: scale(0.97);
+    }
+    .price {
+      text-align: center;
+      background: rgba(44,115,210,0.15);
+      margin: 16px auto;
+      padding: 12px;
+      border-radius: 28px;
+      max-width: 320px;
+      font-weight: 500;
+    }
+    .price strong {
+      color: #ffb347;
+    }
+    .map {
+      display: flex;
+      justify-content: center;
+      margin: 20px auto;
+      padding: 0 12px;
+    }
+    .map img {
+      max-width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+      border: 1px solid var(--border-color);
+      background: white;
+    }
+
+    /* ===== 3-COLUMN AD + STATION GRID LAYOUT ===== */
+    .stations-ad-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 16px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .ad-side {
+      flex: 0 0 220px;
+      background: var(--ad-bg);
+      border-radius: 28px;
+      padding: 16px 12px;
+      border: 1px dashed var(--border-color);
+      text-align: center;
+      transition: all 0.2s;
+      backdrop-filter: blur(2px);
+    }
+    .ad-side a, .ad-detail a {
+      text-decoration: none;
+    }
+    .ad-img {
+      width: 100%;
+      border-radius: 20px;
+      margin: 12px 0;
+      background: #ffffff20;
+      display: inline-block;
+    }
+    .ad-placeholder {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      font-weight: 500;
+    }
+    .stations-container {
+      flex: 1;
+      min-width: 260px;
+    }
+    .rail-line {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+    }
+    .station {
+      background: linear-gradient(145deg, #2c73d2, #1f5bb8);
+      border-radius: 24px;
+      padding: 14px 8px;
+      color: white;
+      text-align: center;
+      width: 150px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      box-shadow: 0 8px 12px rgba(0,0,0,0.2);
+    }
+    .station:hover {
+      transform: translateY(-5px);
+      background: #1f66c2;
+      box-shadow: 0 14px 20px rgba(0,0,0,0.25);
+    }
+    .station a {
+      color: white;
+      text-decoration: none;
+      display: block;
+    }
+    .spot {
+      font-size: 0.7rem;
+      background: rgba(255,215,0,0.3);
+      border-radius: 20px;
+      padding: 4px 6px;
+      margin-top: 8px;
+      display: inline-block;
+      font-weight: normal;
+    }
+
+    /* detail pages */
+    .page {
+      display: none;
+      padding: 24px 20px;
+      max-width: 850px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 32px;
+      margin-top: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .page.active {
+      display: block;
+    }
+    .back-btn {
+      display: block;
+      margin: 28px auto 12px;
+      padding: 10px 24px;
+      background: #2c73d2;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      width: fit-content;
+    }
+    .detail-ad-area {
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 2px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .ad-detail {
+      background: var(--ad-bg);
+      border-radius: 24px;
+      padding: 16px;
+      flex: 1;
+      min-width: 180px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding: 20px;
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border-color);
+    }
+    .footer a {
+      color: #2c73d2;
+    }
+    @media (max-width: 780px) {
+      .stations-ad-row {
+        flex-direction: column;
+      }
+      .ad-side {
+        flex: auto;
+        width: 100%;
+        order: 2;
+      }
+      .stations-container {
+        order: 1;
+      }
+      .ad-side:first-child {
+        order: 1;
+      }
+      .ad-side:last-child {
+        order: 3;
+      }
+      .station {
+        width: calc(50% - 14px);
+        max-width: 180px;
+      }
+    }
+    @media (max-width: 500px) {
+      .station {
+        width: 100%;
+      }
+    }
+    .lang-en { display: block; }
+    .lang-jp { display: none; }
+    body.jp .lang-en { display: none; }
+    body.jp .lang-jp { display: block; }
+    h2, p, li {
+      line-height: 1.4;
+    }
+    .detail-text p {
+      margin: 12px 0;
+    }
+    .highlight {
+      background: #ffd96630;
+      padding: 8px;
+      border-radius: 16px;
+    }
+  </style>
+</head>
+<body class="dark">
+
+<header>
+  <div class="lang-en"><h1>🚃 Yui Rail Guide<br>Naha · Okinawa</h1></div>
+  <div class="lang-jp"><h1>🚃 ゆいレールガイド<br>那覇・沖縄</h1></div>
+  <div class="controls">
+    <button onclick="toggleMode()">🌓 Dark / Light</button>
+    <button onclick="toggleLang()">🔤 English / 日本語</button>
+  </div>
+</header>
+
+<div class="price">
+  <div class="lang-en">
+    🎫 <strong>1-Day Pass</strong> ¥1,000 (Adult) / ¥500 (Child)<br>
+    🎫 <strong>2-Day Pass</strong> ¥1,800 (Adult) / ¥900 (Child)
+  </div>
+  <div class="lang-jp">
+    🎫 <strong>一日乗車券</strong> 大人¥1,000 / 子供¥500<br>
+    🎫 <strong>二日乗車券</strong> 大人¥1,800 / 子供¥900
+  </div>
+</div>
+
+<div class="map">
+  <img class="lang-en" src="https://www.yui-rail.co.jp/common/uploads/routemap_en-1.jpg" alt="Yui Rail Map EN" onerror="this.src='https://placehold.co/600x200?text=Yui+Rail+Map'">
+  <img class="lang-jp" src="https://www.yui-rail.co.jp/common/uploads/routemap_sp_jp-3.jpg" alt="ゆいレール路線図" onerror="this.src='https://placehold.co/600x200?text=路線図'">
+</div>
+
+<!-- 3-col ad + stations layout -->
+<div class="stations-ad-row">
+  <!-- LEFT AD SPACE -->
+  <div class="ad-side" id="ad-left">
+    <div class="lang-en">
+      <div class="ad-placeholder">✨ SPONSOR ✨</div>
+      <a href="https://visitokinawajapan.com/" target="_blank" rel="noopener">
+        <img class="ad-img" src="https://placehold.co/200x150/2c73d2/white?text=Visit+Okinawa" alt="Okinawa Tourism">
+        <div>Okinawa Travel Guide</div>
+      </a>
+      <small>Book tours & hotels</small>
+    </div>
+    <div class="lang-jp">
+      <div class="ad-placeholder">✨ スポンサー ✨</div>
+      <a href="https://visitokinawajapan.com/ja/" target="_blank" rel="noopener">
+        <img class="ad-img" src="https://placehold.co/200x150/2c73d2/white?text=沖縄観光" alt="沖縄観光">
+        <div>沖縄旅行プラン</div>
+      </a>
+      <small>お得なツアー</small>
+    </div>
+  </div>
+
+  <!-- stations container -->
+  <div class="stations-container">
+    <div class="rail-line" id="stationGrid"></div>
+  </div>
+
+  <!-- RIGHT AD SPACE -->
+  <div class="ad-side" id="ad-right">
+    <div class="lang-en">
+      <div class="ad-placeholder">🏨 PARTNER HOTEL</div>
+      <a href="https://www.daiwaroynet.com/naha/" target="_blank">
+        <img class="ad-img" src="https://placehold.co/200x150/ffaa33/1e2a3e?text=DAIWA+Naha" alt="Hotel">
+        <div>Daiwa Roynet Hotel</div>
+      </a>
+      <small>Near Kenchomae St.</small>
+    </div>
+    <div class="lang-jp">
+      <div class="ad-placeholder">🏨 提携ホテル</div>
+      <a href="https://www.daiwaroynet.com/naha/" target="_blank">
+        <img class="ad-img" src="https://placehold.co/200x150/ffaa33/1e2a3e?text=ダイワロイネット" alt="ホテル">
+        <div>ダイワロイネットホテル</div>
+      </a>
+      <small>県庁前徒歩3分</small>
+    </div>
+  </div>
+</div>
+
+<!-- detail pages will be injected here -->
+<div id="detail-container"></div>
+
+<footer class="footer">
+  <p>📧 Contact: <a href="mailto:mementomorikatsu@gmail.com">mementomorikatsu@gmail.com</a></p>
+  <p>© Yui Rail Tourist Guide | PWA Ready</p>
+</footer>
+
+<script>
+  // ---------- STATION DATA (with ENHANCED DETAILS) ----------
+  const stationsData = [
+    { id: 'naha_airport', nameEn: '01 Naha Airport', nameJp: '01 那覇空港', spotEn: 'Airport Terminal', spotJp: '空港ターミナル',
+      detailEn: "Naha Airport Station is the gateway to Okinawa. Directly connected to the domestic terminal. From here you can catch the monorail to the city center in 10 minutes. Great for first-timers. There are tourist info counters and luggage storage.",
+      detailJp: "那覇空港駅は沖縄の玄関口。国内線ターミナル直結。モノレールで市内中心部へ約10分。観光案内所、コインロッカー完備。便利な出発地点。" },
+    { id: 'akamine', nameEn: '02 Akamine', nameJp: '02 赤嶺', spotEn: 'Airport Hotels', spotJp: '空港周辺ホテル',
+      detailEn: "Closest station to many airport hotels, also famous for 'Akamine Shotengai' with local eateries. Great for overnight stays. Walk to Ashibinaa Outlet by bus.",
+      detailJp: "空港周辺ホテルが多いエリア。「赤嶺商店街」には地元食堂あり。アウトレット「あしびなー」へもバスでアクセス可能。" },
+    { id: 'oroku', nameEn: '03 Oroku', nameJp: '03 小禄', spotEn: 'AEON Mall', spotJp: 'イオン小禄',
+      detailEn: "AEON Oroku is a large shopping mall with supermarket, clothing, and restaurants. Popular for bento and souvenirs. Also nearby is 'Oroku Park' with a small playground.",
+      detailJp: "イオン小禄はスーパー、衣料品、レストランが揃う大型ショッピングセンター。お弁当やお土産購入に最適。小禄公園も近く、子供連れに人気。" },
+    { id: 'onoyama', nameEn: '04 Onoyama-kōen', nameJp: '04 奥武山公園', spotEn: 'Onoyama Park & Sports', spotJp: '奥武山公園',
+      detailEn: "Spacious park with baseball stadium, athletic fields, and the famous Ukishima Shrine. Great for jogging and cherry blossoms in spring. The station is just next to the park entrance.",
+      detailJp: "広大な公園で野球場、運動施設、浮島神社があります。春の桜の名所。駅からすぐ公園入口。リラックスや散策に最適。" },
+    { id: 'tsubogawa', nameEn: '05 Tsubogawa', nameJp: '05 壺川', spotEn: 'Kokuba River Walk', spotJp: '国場川沿い',
+      detailEn: "Tranquil riverside path along Kokuba River. Great for sunset walks. The area has cozy cafes and a scenic view of the monorail crossing the bridge.",
+      detailJp: "国場川沿いの散歩道が美しいエリア。夕日の散策にぴったり。モノレールが橋を渡る景色がフォトジェニック。" },
+    { id: 'asahibashi', nameEn: '06 Asahibashi', nameJp: '06 旭橋', spotEn: 'Naha Bus Terminal / Naminoue Beach', spotJp: '那覇バスターミナル・波の上ビーチ',
+      detailEn: "Asahibashi is the main bus hub connecting to north Okinawa and the airport. Naminoue Beach and Naminoue Shrine (cliffside) are a 12-min walk. Beautiful ocean views.",
+      detailJp: "北部方面などへの高速バス乗り場「那覇バスターミナル」が隣接。波の上ビーチ、波上宮まで徒歩12分。絶景スポット。" },
+    { id: 'kencho', nameEn: '07 Kenchōmae', nameJp: '07 県庁前', spotEn: 'Kokusai Street South', spotJp: '国際通り南口',
+      detailEn: "Southern entrance of Kokusai Dori, the famous 1.6km shopping street. Nearby Ryubo Department Store and Palette Kumoji. Great place for yachimun pottery and traditional sweets.",
+      detailJp: "国際通りの南口。デパートリウボウ、パレットくもじ隣接。やちむん（焼物）やちんすこうなどお土産天国。" },
+    { id: 'miebashi', nameEn: '08 Miebashi', nameJp: '08 美栄橋', spotEn: 'Tomari Port (10min) / Kokusai St Center', spotJp: '泊港・国際通り中央',
+      detailEn: "Tomari Port is the gateway to Kerama Islands (ferry). Also the center of Kokusai Street with traditional markets, street food, and souvenir shops. Don't miss the Yui Rail crossing.",
+      detailJp: "泊港から慶良間諸島へフェリーが出航。国際通り中央エリア。市場やストリートフードが充実。ゆいレールのアーチも美しい。" },
+    { id: 'makishi', nameEn: '09 Makishi', nameJp: '09 牧志', spotEn: 'Kokusai Street North', spotJp: '国際通り北口',
+      detailEn: "Northern part of Kokusai Street, close to Makishi Public Market (Naha's kitchen). Taste fresh seafood and enjoy lively izakaya at night. Very vibrant area.",
+      detailJp: "国際通り北側。那覇の台所「牧志公設市場」まで徒歩数分。新鮮な海鮮と夜の居酒屋街がにぎわう。" },
+    { id: 'asato', nameEn: '10 Asato', nameJp: '10 安里', spotEn: 'Sakae-machi Market', spotJp: '栄町市場',
+      detailEn: "Sakae-machi Market is a retro shopping street with local izakayas and authentic Okinawan cuisine. Amazing atmosphere in the evening. Famous for 'Sakaemachi Yakisoba'.",
+      detailJp: "レトロな栄町市場は地元客で賑わうディープスポット。夜は居酒屋が軒を連ね、安里名物「栄町焼きそば」をぜひ。" },
+    { id: 'omoromachi', nameEn: '11 Omoromachi', nameJp: '11 おもろまち', spotEn: 'Shintoshin / DFS T Galleria', spotJp: '新都心・DFS免税店',
+      detailEn: "Modern Shintoshin area with DFS Galleria (duty-free shopping), San-A Main Place, and Naha Museum of Art. Trendy cafes and wide sidewalks perfect for strolling.",
+      detailJp: "新都心エリア。DFS免税店、サンエーmain place、那覇市立美術館。おしゃれなカフェと広々とした街並み。" },
+    { id: 'furujima', nameEn: '12 Furujima', nameJp: '12 古島', spotEn: 'Residential Charm', spotJp: '落ち着いた住宅街',
+      detailEn: "Quiet residential station but close to small parks and local bakeries. A hidden gem for experiencing daily life in Naha. The station has artistic monorail murals.",
+      detailJp: "静かな住宅地。地域密着型のパン屋や小さな公園があり、那覇の日常を感じる。駅のアート壁画が素敵。" },
+    { id: 'shiritsu', nameEn: '13 Shiritsu-byōin-mae', nameJp: '13 市立病院前', spotEn: 'Naha City Hospital', spotJp: '那覇市立病院',
+      detailEn: "Naha City Hospital area, also access to Shuri Castle West Route via bus. Nearby peaceful residential zone with small shrines.",
+      detailJp: "那覇市立病院最寄り。バスで首里城西口方面へアクセス可。周辺は落ち着いた環境。" },
+    { id: 'gibo', nameEn: '14 Gibo', nameJp: '14 儀保', spotEn: 'Shuri Castle West (15min walk)', spotJp: '首里城西口（徒歩15分）',
+      detailEn: "Start of the Shuri Castle area. Walk through traditional stone walls and Ryukyu-era streets. The Gibo intersection leads to the castle's western entrance. Enjoy 'sata andagi' sweets on the way.",
+      detailJp: "首里城エリア入り口。琉球石灰岩の石垣と古い街並みを散策。儀保の交差点から西口へ。サーターアンダギー屋さんも。" },
+    { id: 'shuri', nameEn: '15 Shuri', nameJp: '15 首里', spotEn: 'Shuri Castle East (15min walk)', spotJp: '首里城東口（徒歩15分）',
+      detailEn: "Main gateway to Shuri Castle Park (reconstruction in progress). Visit the Shuri Port (former royal castle) and enjoy panoramic views. Nearby Shuri Ryusen for traditional dyeing experiences.",
+      detailJp: "首里城公園の主要アクセス。世界遺産・首里城（復興工事中）を見学。伝統工房「首里琉染」で藍染体験も。" },
+    { id: 'ishimine', nameEn: '16 Ishimine', nameJp: '16 石嶺', spotEn: 'Local Schools & Peaceful', spotJp: '学校・住宅地',
+      detailEn: "Residential area with parks and small temples. Great for walking enthusiasts and seeing local life. Close to the Ryukyu University campus area.",
+      detailJp: "閑静な住宅地。小さな寺院や公園があり散策向き。琉球大学キャンパスにも近いエリア。" },
+    { id: 'kyozuka', nameEn: '17 Kyozuka', nameJp: '17 経塚', spotEn: 'Residential Hills', spotJp: '高台住宅地',
+      detailEn: "Scenic hillside residential area. Offers nice views of Naha city. Quiet and charming, with small local shops.",
+      detailJp: "高台の住宅地。那覇市街を見渡せる静かなエリア。地域密着型の商店が点在。" },
+    { id: 'uehara', nameEn: '18 Urasoe-Maeda', nameJp: '18 浦添前田', spotEn: 'Hacksaw Ridge / Urasoe Castle Ruins', spotJp: '浦添グスク跡・前田高地',
+      detailEn: "Famous historical site: Hacksaw Ridge (WWII) and Urasoe Castle Ruins with spectacular views. A must-visit for history buffs. The walk from station is about 20 min uphill.",
+      detailJp: "戦跡「前田高地」と浦添グスク跡（国の史跡）があり、絶景ポイント。歴史に興味ある方必見。駅から徒歩20分ほど。" },
+    { id: 'tedako', nameEn: '19 Tedako-Uranishi', nameJp: '19 てだこ浦西', spotEn: 'Highway Bus Hub', spotJp: '高速バスターミナル',
+      detailEn: "Terminal station and major bus hub for highway buses to Nago, Motobu (Churaumi Aquarium), and southern Okinawa. Large park nearby with sports facilities.",
+      detailJp: "終着駅であり、高速バスのハブ。名護・本部（美ら海水族館）方面や南部へのバスが発着。隣接するてだこ公園も広々。" }
+  ];
+
+  // build station grid
+  const stationGrid = document.getElementById('stationGrid');
+  const detailContainer = document.getElementById('detail-container');
+
+  function buildStationGrid() {
+    stationGrid.innerHTML = '';
+    stationsData.forEach(st => {
+      const div = document.createElement('div');
+      div.className = 'station';
+      div.innerHTML = `
+        <a href="#" onclick="showStationDetail('${st.id}'); return false;">
+          <div class="lang-en"><strong>${st.nameEn}</strong><br><span class="spot">${st.spotEn}</span></div>
+          <div class="lang-jp"><strong>${st.nameJp}</strong><br><span class="spot">${st.spotJp}</span></div>
+        </a>
+      `;
+      stationGrid.appendChild(div);
+    });
+  }
+
+  function buildDetailPages() {
+    detailContainer.innerHTML = '';
+    stationsData.forEach(st => {
+      const pageDiv = document.createElement('div');
+      pageDiv.id = st.id;
+      pageDiv.className = 'page';
+      // Enhanced detailed description with HTML formatting
+      pageDiv.innerHTML = `
+        <div class="lang-en">
+          <h2>🚉 ${st.nameEn} Station</h2>
+          <div class="detail-text">
+            <p><strong>📍 Main Highlight:</strong> ${st.spotEn}</p>
+            <p>${st.detailEn}</p>
+            <p class="highlight">🎫 Yui Rail 1-Day Pass recommended for sightseeing. Easy access to major attractions.</p>
+          </div>
+        </div>
+        <div class="lang-jp">
+          <h2>🚉 ${st.nameJp}駅</h2>
+          <div class="detail-text">
+            <p><strong>📍 主な見どころ:</strong> ${st.spotJp}</p>
+            <p>${st.detailJp}</p>
+            <p class="highlight">🎫 観光には一日乗車券が便利。主要スポットへスムーズにアクセス。</p>
+          </div>
+        </div>
+        <div class="detail-ad-area" id="ad-detail-${st.id}"></div>
+        <button class="back-btn" onclick="goBackToMain()">⬅ Back / 戻る</button>
+      `;
+      detailContainer.appendChild(pageDiv);
+
+      // inject dynamic ads inside each detail page
+      const adArea = document.getElementById(`ad-detail-${st.id}`);
+      if (adArea) {
+        adArea.innerHTML = `
+          <div class="ad-detail">
+            <div class="lang-en">
+              <a href="https://www.jalan.net/okinawa/" target="_blank">
+                <img class="ad-img" src="https://placehold.co/300x120/ff8c42/white?text=Jalan+Okinawa" style="max-width:100%">
+                <div>🏨 Hotel deals & tours</div>
+              </a>
+            </div>
+            <div class="lang-jp">
+              <a href="https://www.jalan.net/okinawa/" target="_blank">
+                <img class="ad-img" src="https://placehold.co/300x120/ff8c42/white?text=じゃらん沖縄" style="max-width:100%">
+                <div>🏨 宿泊＆ツアー予約</div>
+              </a>
+            </div>
+          </div>
+          <div class="ad-detail">
+            <div class="lang-en">
+              <a href="https://www.yui-rail.co.jp/en/" target="_blank">
+                <img class="ad-img" src="https://placehold.co/300x120/2c73d2/white?text=Official+Yui+Rail" style="max-width:100%">
+                <div>Official Pass & Timetable</div>
+              </a>
+            </div>
+            <div class="lang-jp">
+              <a href="https://www.yui-rail.co.jp/" target="_blank">
+                <img class="ad-img" src="https://placehold.co/300x120/2c73d2/white?text=ゆいレール公式" style="max-width:100%">
+                <div>運賃・時刻表</div>
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    });
+  }
+
+  window.showStationDetail = function(id) {
+    // hide main layout: map, price, stations row
+    document.querySelector('.price').style.display = 'none';
+    document.querySelector('.map').style.display = 'none';
+    document.querySelector('.stations-ad-row').style.display = 'none';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const targetPage = document.getElementById(id);
+    if (targetPage) targetPage.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  window.goBackToMain = function() {
+    document.querySelector('.price').style.display = 'block';
+    document.querySelector('.map').style.display = 'flex';
+    document.querySelector('.stations-ad-row').style.display = 'flex';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  };
+
+  // language & theme
+  window.toggleLang = function() {
+    document.body.classList.toggle('jp');
+  };
+  window.toggleMode = function() {
+    document.body.classList.toggle('dark');
+    document.body.classList.toggle('light');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('yuiTheme', isDark ? 'dark' : 'light');
+  };
+  function loadTheme() {
+    const saved = localStorage.getItem('yuiTheme');
+    if (saved === 'light') {
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
+    } else {
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
+    }
+  }
+
+  // ----- PWA MANIFEST (dynamic with icons 512x512 & 192x192 SVG DataURI) -----
+  function generateManifest() {
+    const icon192 = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%232c73d2'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' fill='white' font-family='monospace'%3EYR%3C/text%3E%3C/svg%3E";
+    const icon512 = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%232c73d2'/%3E%3Ctext x='256' y='360' font-size='280' text-anchor='middle' fill='white' font-family='monospace'%3Eゆい%3C/text%3E%3C/svg%3E";
+    const manifestObj = {
+      name: "Yui Rail Tourist Guide",
+      short_name: "YuiRail",
+      description: "Naha Okinawa Monorail Tourist Guide",
+      start_url: ".",
+      display: "standalone",
+      theme_color: "#2c73d2",
+      background_color: "#0b1a2e",
+      icons: [
+        { src: icon192, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+        { src: icon512, sizes: "512x512", type: "image/svg+xml", purpose: "any" }
+      ]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    const manifestLink = document.getElementById('manifest-link');
+    manifestLink.setAttribute('href', manifestURL);
+  }
+  generateManifest();
+
+  // ----- SERVICE WORKER (offline caching) -----
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(err => console.log("SW fallback inline", err));
+    // create inline service worker if sw.js not existing, but we'll inject a basic functional SW via blob
+    // Actually to make PWA fully work, we create a blob URL sw.
+    const swCode = `
+      const CACHE = "yui-rail-v1";
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['/'])));
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(resp => resp || fetch(e.request)));
+      });
+    `;
+    const swBlob = new Blob([swCode], {type: 'application/javascript'});
+    const swURL = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swURL).then(reg => console.log("SW registered", reg)).catch(err => console.log(err));
+  }
+
+  // initialization
+  buildStationGrid();
+  buildDetailPages();
+  loadTheme();
+
+  // fix default visible stations row
+  document.querySelector('.price').style.display = 'block';
+  document.querySelector('.map').style.display = 'flex';
+  document.querySelector('.stations-ad-row').style.display = 'flex';
+</script>
+</body>
+</html>
